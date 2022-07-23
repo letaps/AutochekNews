@@ -19,7 +19,7 @@ export class AppService {
     return await 'Hello World Tapiwa!';
   }
 
-  async getLast25Stories(){
+  async getLast25Stories(): Promise <any>{
     let { data } = await firstValueFrom(this.httpService.get(this.getNewStories500Url));
     let str = '';
     
@@ -28,65 +28,11 @@ export class AppService {
                   return 'https://hacker-news.firebaseio.com/v0/item/'+ i +'.json?print=pretty'; 
                 });
     
-    Promise.all(urls.map(i=>{
+    return Promise.all(urls.map(i=>{
       return fetch(i)
       .then(res => res.json())
       .then(data => data)
-    })).then((data)=>{
-      let result = data.map((i)=>{
-        const { title } = i;
-        return title;
-      })
-      .join(" ")
-      .replace(/[\s]/gmi, "AAAAABBBBBCCCCC")
-      .replace(/[\W]/gmi, "")
-      .split("AAAAABBBBBCCCCC");
-      
-      //Get frequency
-      const getFrequency = (arr, word)=>{
-        let count = 0;
-        arr.forEach((item) => {
-          if(word == item){
-            count += 1;
-          }
-        });
-
-        return count;
-      };
-
-      //Unique words
-      let arr1 = [... new Set(result)];
-      let result_array = arr1.map((item)=>{
-        let object = {
-          "word": item,
-          "frequency": getFrequency(result, item)
-        };
-
-        return object;
-      })
-      .sort((a, b)=>{
-        return a.frequency - b.frequency;
-      })
-      .reverse()
-      .slice(0, 10);
-
-      console.log(result_array);
-      console.log('Unique: ' + arr1.length);
-      console.log('Raw: ' + result.length);
-    })
-
-    console.log(urls);
-    // data.slice(0, 25)
-    //     .forEach((item)=>{
-    //         this.getTitleOfStory(item)
-    //           .then(res => res.json())
-    //           .then((data: {title: ''})=>{
-    //             const { title } = data;
-    //             str += title;
-    //           }).toString();
-    //     });
-    // console.log(str);
-    return str;
+    }))
   } 
 
   async getTitleOfStory (id : String) {
